@@ -1,6 +1,7 @@
 package com.example.authentication.controller;
 
 import com.example.authentication.service.CustomUserDetailsService;
+import com.example.authentication.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,9 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -75,6 +79,15 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody UserRegistrationRequest request) {
+        try {
+            userService.registerUser(request.getUsername(), request.getPassword(), "ROLE_USER");
+            return ResponseEntity.ok("User registered successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/test-auth")
     public ResponseEntity<String> testAuth() {
@@ -91,24 +104,46 @@ public class AuthController {
 
 }
 
-     class LoginRequest {
-        private String username;
-        private String password;
+ class LoginRequest {
+    private String username;
+    private String password;
 
-        // Getters and setters
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
+    // Getters and setters
+    public String getUsername() {
+        return username;
     }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+
+class UserRegistrationRequest {
+    private String username;
+    private String password;
+
+    // Getters and setters
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
